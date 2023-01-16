@@ -23,7 +23,7 @@ function reset(){
     end.value = null;
     key.value = null;
     cnt = 1;
-    msg.innerText = "ALL THE BEST!!"
+    msg.innerText ="Click enter to check your guess! \nALL THE BEST!!";
 
 }
 function rest(){
