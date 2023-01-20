@@ -1,0 +1,34 @@
+body{
+    font-family: 'Courier New', Courier, monospace;
+    text-align:center;
+    position: relative;
+    font-size: 20px;
+    background-color: #8daeb5;
+
+    
+}
+body>h1{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.score{
+    position: absolute;
+    right: 120px;
+    top:250px;
+    font-weight: 600;
+    font-size: 30px;
+}
+.endgame{
+    display: none;
+    width:300px;
+    top:200px;
+    background-color: blue;
+    position: absolute;
+    left : 50%;
+    margin-left: -130px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    text-align: center;
+    border-radius: 5px;
+    color:white;
+    font-size:2em;
+}

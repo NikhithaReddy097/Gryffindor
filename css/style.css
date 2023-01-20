@@ -14,6 +14,9 @@
 /* html {
     scroll-behavior: smooth;
 } */
+.adj{
+    padding: 0;
+}
 body {
     color: #666666;
     font-size: 14px;
@@ -156,7 +159,7 @@ button {
 
 .roww{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-wrap: wrap;
     margin-right: -15px;
     margin-left: -15px;
@@ -217,6 +220,42 @@ button {
     width: 100%;
     float: left;
     background-image: url(../images/img-3.png);
+    height: auto;
+    background-size: cover;
+    padding-bottom: 40px;
+    border-radius: 30px;
+}
+.image_32 {
+    width: 100%;
+    float: left;
+    background-image: url(../images/img-32.png);
+    height: auto;
+    background-size: cover;
+    padding-bottom: 40px;
+    border-radius: 30px;
+}
+.image_33 {
+    width: 100%;
+    float: left;
+    background-image: url(../images/img-33.png);
+    height: auto;
+    background-size: cover;
+    padding-bottom: 40px;
+    border-radius: 30px;
+}
+.image_34 {
+    width: 100%;
+    float: left;
+    background-image: url(../images/img-34.png);
+    height: auto;
+    background-size: cover;
+    padding-bottom: 40px;
+    border-radius: 30px;
+}
+.image_35 {
+    width: 100%;
+    float: left;
+    background-image: url(../images/img-35.png);
     height: auto;
     background-size: cover;
     padding-bottom: 40px;

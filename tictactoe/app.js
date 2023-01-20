@@ -1,145 +1,124 @@
-let originalBoard;
-const huPlayer = "O";
-const aiPlayer = "X";
-const winCombos=[
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-    [0,4,8],
-    [6,4,2]
-]
+window.addEventListener('DOMContentLoaded', () => {
+    const tiles = Array.from(document.querySelectorAll('.tile'));
+    const playerDisplay = document.querySelector('.display-player');
+    const resetButton = document.querySelector('#reset');
+    const announcer = document.querySelector('.announcer');
 
-const cells = document.querySelectorAll(".cell");
-startGame();
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let isGameActive = true;
 
-function startGame(){
-    document.querySelector(".endgame").style.display="none";
-    originalBoard =  Array.from(Array(9).keys());
-    for(let i=0;i<cells.length;i++){
-        cells[i].innerHTML='';
-        cells[i].style.removeProperty('background-color');
-        cells[i].addEventListener('click',turnClick,false);
-    }
+    const PLAYERX_WON = 'PLAYERX_WON';
+    const PLAYERO_WON = 'PLAYERO_WON';
+    const TIE = 'TIE';
 
-}
 
-function turnClick(square){
-    if(typeof originalBoard[square.target.id] == 'number'){
-        turn(square.target.id,huPlayer);
-        let gameWon = checkWin(originalBoard,huPlayer);
-        if(gameWon) gameOver(gameWon)
-        else if(!checkTie()) turn(bestSpot(), aiPlayer);
-    }
-}
+    /*
+        Indexes within the board
+        [0] [1] [2]
+        [3] [4] [5]
+        [6] [7] [8]
+    */
 
-function turn(id, player){
-    originalBoard[id] = player;
-    document.getElementById(id).innerHTML = player;
-    let gameWon = checkWin(originalBoard,player);
-    if(gameWon) gameOver(gameWon)
-}
+    const winningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
 
-function checkWin(board,player){
-    //Know about this REDUCE
-    let plays = board.reduce((a,e,i)=>
-    (e === player) ? a.concat(i):a,[]);
-
-    let gameWon = null;
-    for(let [index,win] of winCombos.entries()){
-        if(win.every(elem => plays.indexOf(elem) >-1)){
-            gameWon = {index: index,player: player};
-            break;
+    function handleResultValidation() {
+        let roundWon = false;
+        for (let i = 0; i <= 7; i++) {
+            const winCondition = winningConditions[i];
+            const a = board[winCondition[0]];
+            const b = board[winCondition[1]];
+            const c = board[winCondition[2]];
+            if (a === '' || b === '' || c === '') {
+                continue;
+            }
+            if (a === b && b === c) {
+                roundWon = true;
+                break;
+            }
         }
-    }
-    return gameWon;
-}
 
-function gameOver(gameWon){
-    for(let index of winCombos[gameWon.index]){
-        document.getElementById(index).style.backgroundColor = gameWon.player == huPlayer?"green":"red";
-    }
-    for (let i=0;i<cells.length;i++){
-        cells[i].removeEventListener('click',turnClick,false);
-    }
-    declareWinner(gameWon.player == huPlayer?"You win!":"You lose!");
-}
-
-function bestSpot(){
-    return minimax(originalBoard,aiPlayer).index;
-}
-
-function emptyScores(){
-    return originalBoard.filter(s=> typeof s=='number');
-}
-
-function checkTie(){
-    if(emptyScores().length == 0) {
-        for(let i=0;i<cells.length;i++){
-            cells[i].style.backgroundColor = "blue";
-            cells[i].removeEventListener('click',turnClick,false);
+    if (roundWon) {
+            announce(currentPlayer === 'X' ? PLAYERX_WON : PLAYERO_WON);
+            isGameActive = false;
+            return;
         }
-        declareWinner("Tie Game!");
+
+    if (!board.includes(''))
+        announce(TIE);
+    }
+
+    const announce = (type) => {
+        switch(type){
+            case PLAYERO_WON:
+                announcer.innerHTML = 'Player <span class="playerO">O</span> Won';
+                break;
+            case PLAYERX_WON:
+                announcer.innerHTML = 'Player <span class="playerX">X</span> Won';
+                break;
+            case TIE:
+                announcer.innerText = 'Tie';
+        }
+        announcer.classList.remove('hide');
+    };
+
+    const isValidAction = (tile) => {
+        if (tile.innerText === 'X' || tile.innerText === 'O'){
+            return false;
+        }
+
         return true;
-    }
-    return false;
-}
+    };
 
-function declareWinner(who){
-    document.querySelector(".endgame").style.display = "block";
-    document.querySelector(".endgame .text").innerHTML = who;
-}
-
-function minimax(newBoard,player){
-    var availSpots = emptyScores(newBoard);
-
-    if(checkWin(newBoard,player)){
-        return{score:-10};
-    }
-    else if(checkWin(newBoard,aiPlayer)){
-        return {score:20};
-    }
-    else if(availSpots.length==0){
-        return {score:0};
+    const updateBoard =  (index) => {
+        board[index] = currentPlayer;
     }
 
-    var moves = [];
-    for(let i=0;i<availSpots.length;i++){
-        var move = {};
-        move.index = newBoard[availSpots[i]];
-        newBoard[availSpots[i]] = player;
-
-        if(player == aiPlayer){
-            var result = minimax(newBoard,huPlayer);
-            move.score = result.score;
-        }
-        else{
-            var result = minimax(newBoard,aiPlayer);
-            move.score = result.score;
-        }
-        newBoard[availSpots[i]] =  move.index;
-        moves.push(move);
+    const changePlayer = () => {
+        playerDisplay.classList.remove(`player${currentPlayer}`);
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        playerDisplay.innerText = currentPlayer;
+        playerDisplay.classList.add(`player${currentPlayer}`);
     }
-    var bestMove;
-    if(player === aiPlayer){
-        var bestScore = -10000;
-        for(let i=0;i<moves.length;i++){
-            if(moves[i].score > bestScore){
-                bestScore = moves[i].score;
-                bestMove = i;
-            }
+
+    const userAction = (tile, index) => {
+        if(isValidAction(tile) && isGameActive) {
+            tile.innerText = currentPlayer;
+            tile.classList.add(`player${currentPlayer}`);
+            updateBoard(index);
+            handleResultValidation();
+            changePlayer();
         }
     }
-    else{
-        var bestScore = 10000;
-        for(let i=0;i<moves.length;i++){
-            if(moves[i].score < bestScore){
-                bestScore = moves[i].score;
-                bestMove = i;
-            }
+    
+    const resetBoard = () => {
+        board = ['', '', '', '', '', '', '', '', ''];
+        isGameActive = true;
+        announcer.classList.add('hide');
+
+        if (currentPlayer === 'O') {
+            changePlayer();
         }
+
+        tiles.forEach(tile => {
+            tile.innerText = '';
+            tile.classList.remove('playerX');
+            tile.classList.remove('playerO');
+        });
     }
-    return moves[bestMove];
-}
+
+    tiles.forEach( (tile, index) => {
+        tile.addEventListener('click', () => userAction(tile, index));
+    });
+
+    resetButton.addEventListener('click', resetBoard);
+});
